@@ -1,9 +1,8 @@
-
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>อัปโหลดและแปลงรูปภาพ</title>
+  <title>แปลงรูปภาพออนไลน์</title>
   <!-- Vue 3 CDN -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <!-- Tailwind CSS CDN -->
@@ -12,23 +11,30 @@
   <link href="https://cdn.jsdelivr.net/npm/daisyui@1.20.0/dist/full.css" rel="stylesheet">
   <!-- HEIC2ANY CDN -->
   <script src="https://cdn.jsdelivr.net/npm/heic2any@latest/dist/heic2any.min.js"></script>
+  <!-- Google Fonts: Kanit -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap">
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+    }
+  </style>
 </head>
-<body class="bg-green-100 text-gray-900">
-  <div id="app" class="min-h-screen flex flex-col items-center justify-center p-6">
+<body class="bg-gray-100 text-gray-900">
+  <div id="app" class="min-h-screen flex flex-col items-center justify-center p-8 space-y-6">
     <!-- Header -->
-    <header class="text-center mb-8">
-      <h1 class="text-4xl font-bold text-green-700 mb-4">อัปโหลดและแปลงรูปภาพ</h1>
-      <p class="text-xl text-green-600">อัปโหลดรูปภาพและแปลงเป็น JPG, PNG หรือรูปแบบอื่นๆ</p>
+    <header class="text-center mb-12">
+      <h1 class="text-4xl font-extrabold text-gray-800 mb-4">แปลงรูปภาพออนไลน์</h1>
+      <p class="text-lg text-gray-600">อัปโหลดรูปภาพและแปลงเป็นฟอร์แมตที่ต้องการ เช่น JPG, PNG, WebP</p>
     </header>
     
     <!-- Image Upload Section -->
-    <section class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg text-center">
-      <div class="mb-4">
-        <input type="file" @change="handleFileUpload" class="file-input file-input-bordered w-full max-w-md mx-auto" accept="image/*">
+    <section class="bg-white p-8 rounded-xl shadow-lg w-full max-w-lg text-center border border-gray-300 space-y-6">
+      <div>
+        <input type="file" @change="handleFileUpload" class="file-input file-input-bordered file-input-primary w-full max-w-lg mx-auto" accept="image/*">
       </div>
       
-      <div class="mb-4">
-        <select v-model="selectedFormat" class="select select-bordered w-full max-w-md mx-auto">
+      <div>
+        <select v-model="selectedFormat" class="select select-bordered select-primary w-full max-w-lg mx-auto">
           <option value="image/jpeg">แปลงเป็น JPG</option>
           <option value="image/png">แปลงเป็น PNG</option>
           <option value="image/webp">แปลงเป็น WebP</option>
@@ -39,22 +45,23 @@
         </select>
       </div>
       
-      <button @click="convertImage" :disabled="isProcessing || !file" class="btn btn-success w-full max-w-md" :class="{ 'btn-disabled': isProcessing }">แปลงรูปภาพ</button>
+      <button @click="convertImage" :disabled="isProcessing || !file" class="btn btn-primary w-full max-w-lg" :class="{ 'btn-disabled': isProcessing }">แปลงรูปภาพ</button>
       
       <!-- Processing Indicator -->
-      <div v-if="isProcessing" class="mt-4">
-        <div class="alert alert-warning shadow-lg">
-          <div>
+      <div v-if="isProcessing" class="mt-6">
+        <div class="alert alert-info shadow-lg">
+          <div class="flex items-center">
+            <svg class="w-6 h-6 mr-2 text-blue-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 1116 0A8 8 0 014 12zm0 0a8 8 0 1016 0 8 8 0 00-16 0z"></path></svg>
             <span>กำลังประมวลผล...</span>
           </div>
         </div>
       </div>
       
       <!-- Preview Section -->
-      <div v-if="preview" class="mt-6">
-        <h2 class="text-lg font-semibold mb-2">พรีวิว:</h2>
-        <img :src="preview" alt="พรีวิวรูปภาพ" class="max-w-full h-auto mb-4 rounded-lg shadow-md">
-        <a :href="downloadLink" download="converted-image" class="btn btn-primary">ดาวน์โหลดรูปภาพ</a>
+      <div v-if="preview" class="mt-8">
+        <h2 class="text-xl font-semibold mb-4">พรีวิว:</h2>
+        <img :src="preview" alt="พรีวิวรูปภาพ" class="max-w-full h-auto mb-4 rounded-lg shadow-md border border-gray-300">
+        <a :href="downloadLink" download="converted-image" class="btn btn-secondary w-full max-w-lg">ดาวน์โหลดรูปภาพ</a>
       </div>
     </section>
   </div>
