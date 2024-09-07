@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>แปลงไฟล์รูปภาพของยางพารา</title>
+  <title>อัปโหลดและแปลงรูปภาพ</title>
   <!-- Vue 3 CDN -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <!-- Tailwind CSS CDN -->
@@ -13,24 +13,26 @@
   <div id="app" class="min-h-screen flex flex-col items-center justify-center p-6">
     <!-- Header -->
     <header class="text-center mb-8">
-      <h1 class="text-3xl font-bold mb-4">Image Upload and Convert</h1>
-      <p class="text-lg text-gray-600">Upload an image and convert it to JPG, PNG, or other formats</p>
+      <h1 class="text-3xl font-bold mb-4">อัปโหลดและแปลงรูปภาพ</h1>
+      <p class="text-lg text-gray-600">อัปโหลดรูปภาพและแปลงเป็น JPG, PNG หรือรูปแบบอื่นๆ</p>
     </header>
     <!-- Image Upload Section -->
     <section class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg text-center">
       <input type="file" @change="handleFileUpload" class="mb-4 w-full max-w-md mx-auto">
       <select v-model="selectedFormat" class="mb-4 p-2 border border-gray-300 rounded w-full max-w-md mx-auto">
-        <option value="image/jpeg">Convert to JPG</option>
-        <option value="image/png">Convert to PNG</option>
-        <option value="image/webp">Convert to WebP</option>
-        <option value="image/gif">Convert to GIF</option>
+        <option value="image/jpeg">แปลงเป็น JPG</option>
+        <option value="image/png">แปลงเป็น PNG</option>
+        <option value="image/webp">แปลงเป็น WebP</option>
+        <option value="image/gif">แปลงเป็น GIF</option>
       </select>
-      <button @click="convertImage" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Convert Image</button>
+      <button @click="convertImage" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">แปลงรูปภาพ</button>
+      <!-- Processing Indicator -->
+      <div v-if="isProcessing" class="mt-4 text-yellow-500">กำลังประมวลผล...</div>
       <!-- Preview Section -->
       <div v-if="preview" class="mt-6">
-        <h2 class="text-lg font-semibold mb-2">Preview:</h2>
-        <img :src="preview" alt="Preview Image" class="max-w-full h-auto mb-4">
-        <a :href="downloadLink" download="converted-image" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Download Image</a>
+        <h2 class="text-lg font-semibold mb-2">พรีวิว:</h2>
+        <img :src="preview" alt="พรีวิวรูปภาพ" class="max-w-full h-auto mb-4">
+        <a :href="downloadLink" download="converted-image" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">ดาวน์โหลดรูปภาพ</a>
       </div>
     </section>
   </div>
@@ -42,7 +44,8 @@
         return {
           selectedFormat: 'image/jpeg',
           preview: null,
-          downloadLink: null
+          downloadLink: null,
+          isProcessing: false
         };
       },
       methods: {
@@ -51,13 +54,19 @@
           if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-              this.preview = e.target.result;
+              const img = new Image();
+              img.onload = () => {
+                this.preview = e.target.result;
+                this.downloadLink = null; // Clear previous download link
+              };
+              img.src = e.target.result;
             };
             reader.readAsDataURL(file);
           }
         },
         convertImage() {
           if (this.preview) {
+            this.isProcessing = true; // Show processing indicator
             const canvas = document.createElement('canvas');
             const img = new Image();
             img.onload = () => {
@@ -66,6 +75,7 @@
               const ctx = canvas.getContext('2d');
               ctx.drawImage(img, 0, 0);
               this.downloadLink = canvas.toDataURL(this.selectedFormat);
+              this.isProcessing = false; // Hide processing indicator
             };
             img.src = this.preview;
           }
