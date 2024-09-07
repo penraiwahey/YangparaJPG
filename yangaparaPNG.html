@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Convert</title>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <div id="app" class="min-h-screen flex flex-col items-center justify-center p-6">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-4">Image Upload and Convert</h1>
+            <p class="text-lg text-gray-600">Upload an image and convert it to JPG or PNG</p>
+        </header>
+
+        <!-- Image Upload Section -->
+        <section class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg text-center">
+            <input type="file" @change="handleFileUpload" class="mb-4">
+            <select v-model="selectedFormat" class="mb-4 p-2 border border-gray-300 rounded">
+                <option value="image/jpeg">Convert to JPG</option>
+                <option value="image/png">Convert to PNG</option>
+            </select>
+            <button @click="convertImage" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Convert Image
+            </button>
+
+            <!-- Preview Section -->
+            <div v-if="preview" class="mt-6">
+                <h2 class="text-lg font-semibold mb-2">Preview:</h2>
+                <img :src="preview" alt="Preview Image" class="max-w-full h-auto mb-4">
+                <a :href="downloadLink" download="converted-image" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Download Image</a>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    selectedFormat: 'image/jpeg',
+                    preview: null,
+                    downloadLink: null
+                };
+            },
+            methods: {
+                handleFileUpload(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.preview = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                },
+                convertImage() {
+                    if (this.preview) {
+                        const canvas = document.createElement('canvas');
+                        const img = new Image();
+                        img.onload = () => {
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            this.downloadLink = canvas.toDataURL(this.selectedFormat);
+                        };
+                        img.src = this.preview;
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+
+
+</body></html>
